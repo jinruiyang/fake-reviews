@@ -1,0 +1,25 @@
+# Accuracy: 51.72%
+
+# Confusion Matrix:
+                 |     m    |
+                 |     o    |
+                 |     d    |
+                 |     e    |
+                 |     r    |
+                 |     a    |
+                 |     t  n |
+                 |     e  o |
+                 |     d  n |
+                 |     _  _ |
+                 |  b  b  b |
+                 |  i  i  i |
+                 |  a  a  a |
+                 |  s  s  s |
+                 |  e  e  e |
+                 |  d  d  d |
+-----------------+----------+
+          biased | <.> 7  7 |
+moderated_biased |  .<41>66 |
+      non_biased |  . 18<64>|
+-----------------+----------+
+(row = reference; col = test)
