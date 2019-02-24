@@ -78,8 +78,8 @@ class bias_classifier():
 
 if __name__ == '__main__':
     c = bias_classifier(['non_bias.pkl', 'bias.pkl', 'moderate_bias.pkl'], [0.7,0.1])
-    c.feature_extraction()
-    clf = c.train(model_name='NB')
+    # c.feature_extraction()
+    clf = c.train(model_name='SVM')
     # c.validation(clf)
     # c.testing(clf)
 

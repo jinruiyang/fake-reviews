@@ -7,9 +7,7 @@ import random
 def load_data(file_lists, fractions = [0.7, 0.1], random_seed = 123456, label_mode = 1):
     if label_mode > 2:
         raise RuntimeError('Do not have label mode {mode}'.format(mode = label_mode))
-    if len(fractions) != 2:
-        raise RuntimeError('fractions error')
-    if np.sum(fractions) >= 1:
+    if len(fractions) != 2 or np.sum(fractions) >= 1:
         raise RuntimeError('fractions error')
     fractions[1] = fractions[0] + fractions[1]
     data_set = []

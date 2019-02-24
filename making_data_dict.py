@@ -23,9 +23,9 @@ def preprocessing(file):
         sentence = re.sub('[^A-Za-z]', ' ', sentence)
         sentence = tokenizer.tokenize(sentence)
         sentence = [w.lower() for w in sentence]
-        sentence = [w for w in sentence if not w in stop_words]
-        for w in range (len(sentence)):
-            sentence[w] = stemmer.stem(sentence[w])
+        # sentence = [w for w in sentence if not w in stop_words]
+        # for w in range (len(sentence)):
+        #     sentence[w] = stemmer.stem(sentence[w])
         sentence = ' '.join(sentence)
         if sentence in list(dic.keys()):
             print('conflict in : ', sentence)
