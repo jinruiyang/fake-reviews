@@ -9,6 +9,7 @@ import torch.optim as optim
 import torch.optim.lr_scheduler as scheduler
 import torch.nn as nn
 from model import model
+from center_loss import CenterLoss
 
 class FFN():
     def __init__(self, num_epochs = 10, batch_size = 100, lr = 0.01, feature_size = 100, pretrained = None):
@@ -24,12 +25,14 @@ class FFN():
         if pretrained:
             self._load_model(pretrained)
 
-    def fit(self, training_data, training_labels, validation_data, validation_labels):
+    def fit(self, training_data, training_labels, validation_data, validation_labels, alpha = 0.5):
         training_set = self._makeing_dataset(training_data, training_labels)
         validation_set = self._makeing_dataset(validation_data, validation_labels)
+        # center_loss = CenterLoss(num_classes=2, feat_dim=2, use_gpu=True)
         cross_entropy_loss = nn.CrossEntropyLoss()
-        optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
-        schedule = scheduler.StepLR(optimizer, 1, gamma=0.999)
+        # params = list(self.model.parameters()) + list(center_loss.parameters())
+        optimizer = optim.SGD(self.model.parameters(), lr=self.lr, momentum=0.9, weight_decay=0.0001)
+        schedule = scheduler.CosineAnnealingLR(optimizer, self.epochs, eta_min=1e-4)
         for i in range(0, self.epochs):
             self.model.train()
             running_loss = 0.0
@@ -39,13 +42,17 @@ class FFN():
                 optimizer.zero_grad()
                 with torch.set_grad_enabled(True):
                     outputs = self.model(inputs)
+                    # loss = alpha*cross_entropy_loss(outputs, labels)+(1-alpha)*center_loss(outputs,labels)
                     loss = cross_entropy_loss(outputs, labels)
                     loss.backward()
+                    # for param in center_loss.parameters():
+                    #     param.grad.data *= (1./alpha)
                     optimizer.step()
 
                 running_loss += loss.item() * inputs.size(0)
                 sys.stdout.flush()
                 print('\repoch:{epoch} Loss {loss:.6f}'.format(epoch=i, loss=loss), end="")
+            schedule.step()
                 
             epoch_loss = running_loss / len(training_data)
             print(' ')

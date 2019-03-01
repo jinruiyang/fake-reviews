@@ -31,6 +31,8 @@ from torch.utils.data.distributed import DistributedSampler
 from pytorch_pretrained_bert.tokenization import BertTokenizer
 from pytorch_pretrained_bert.modeling import BertModel
 
+import numpy as np
+
 logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s', 
                     datefmt = '%m/%d/%Y %H:%M:%S',
                     level = logging.INFO)
@@ -192,7 +194,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     ## Required parameters
-    parser.add_argument("--input_file", default='./bert_feature/bias_raw.txt', type=str)
+    parser.add_argument("--input_file", default='./bert_feature/moderate_bias_raw.txt', type=str)
     parser.add_argument("--output_file", default='out.txt', type=str)
     parser.add_argument("--bert_model", default='bert-base-uncased', type=str,
                         help="Bert pre-trained model selected in the list: bert-base-uncased, "
@@ -256,10 +258,11 @@ def main():
         eval_sampler = SequentialSampler(eval_data)
     else:
         eval_sampler = DistributedSampler(eval_data)
-    eval_dataloader = DataLoader(eval_data, sampler=eval_sampler, batch_size=args.batch_size, num_workers=4)
+    eval_dataloader = DataLoader(eval_data, sampler=eval_sampler, batch_size=args.batch_size)
 
     model.eval()
     with open(args.output_file, "w", encoding='utf-8') as writer:
+        file_index = 0
         for input_ids, input_mask, example_indices in eval_dataloader:
             input_ids = input_ids.to(device)
             input_mask = input_mask.to(device)
@@ -268,13 +271,14 @@ def main():
             all_encoder_layers = all_encoder_layers
 
             for b, example_index in enumerate(example_indices):
+                file_index += 1
                 feature = features[example_index.item()]
                 unique_id = int(feature.unique_id)
                 # feature = unique_id_to_feature[unique_id]
-                sentence_feature = torch.sum(all_encoder_layers[int(-1)][b], dim = 0)
-                sentence_feature = str(sentence_feature.detach().cpu().numpy())
-
-                writer.write(sentence_feature + "\n")
+                sentence_feature = torch.sum(all_encoder_layers[-1][b], dim = 0)
+                sentence_feature = sentence_feature.detach().cpu().numpy()
+                np.save('./bert_feature/numpy_features/moderate_bias/'+str(file_index)+'.npy', sentence_feature)
+                # writer.write(sentence_feature + "\n")
 
 
 if __name__ == "__main__":

@@ -16,22 +16,27 @@ class model(nn.Module):
         super(model,self).__init__()
 
         self.model = nn.Sequential(
-        nn.Linear(input_feature,16),
+        nn.Linear(input_feature,512),
         nn.ReLU(),
-        nn.Linear(16,64),
+        nn.Dropout(0.3),
+        nn.Linear(512,256),
+        nn.BatchNorm1d(256),
+        nn.ReLU(),
+        nn.Dropout(0.3),
+        nn.Linear(256,128),
+        nn.BatchNorm1d(128),
+        nn.ReLU(),
+        nn.Dropout(0.3),
+        nn.Linear(128,64),
         nn.BatchNorm1d(64),
         nn.ReLU(),
-        nn.Linear(64,256),
+        nn.Dropout(0.3),
+        nn.Linear(64,32),
+        nn.BatchNorm1d(32),
         nn.ReLU(),
-        nn.Dropout(0.4),
-        nn.Linear(256,512),
-        nn.BatchNorm1d(512),
+        nn.Linear(32,8),
         nn.ReLU(),
-        nn.Linear(512,128),
-        nn.ReLU(),
-        nn.Linear(128,32),
-        nn.ReLU(),
-        nn.Linear(32,2),
+        nn.Linear(8,2),
         )
 
     def forward(self,x):
