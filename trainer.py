@@ -8,11 +8,12 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import SVC
 from sklearn import metrics
 from FFN_example import FFN
+from CNN_example import CNN
 import pickle
 
 class bias_classifier():
     def __init__(self, data_path, data_fraction):
-        self.dataset  = data_loader.load_data(data_path, data_fraction, random_seed=123456, label_mode=2, over_sampling=True)
+        self.dataset  = data_loader.load_data(data_path, data_fraction, random_seed=123456, label_mode=2, over_sampling=False)
         self.training_data, self.validation_data, self.testing_data, self.training_label, self.validation_label, self.testing_label = self.dataset
 
 
@@ -67,7 +68,13 @@ class bias_classifier():
             with open('SVM.pickle', 'wb') as f:
                 pickle.dump(clf, f)
         elif model_name == 'FFN':
-            clf = FFN(num_epochs = 80, batch_size = 100, lr = 0.002, feature_size = 768)
+            clf = FFN(num_epochs = 40, batch_size = 256, lr = 0.001, feature_size = 768)
+            if pretrain:
+                clf._load_model(pretrain)
+                return clf
+            clf.fit(self.training_data, self.training_label, self.validation_data, self.validation_label)
+        elif model_name == 'CNN':
+            clf = CNN(num_epochs = 40, batch_size = 256, lr = 0.001)
             if pretrain:
                 clf._load_model(pretrain)
                 return clf
@@ -88,8 +95,8 @@ class bias_classifier():
 if __name__ == '__main__':
     c = bias_classifier(['non_bias.pkl', 'bias.pkl', 'moderate_bias.pkl'], [0.8,0.1])
     # c.feature_extraction()
-    # clf = c.train(model_name='FFN', pretrain='./models/FFN3/model_epoch_48.pth')
-    clf = c.train(model_name='FFN')
+    # clf = c.train(model_name='FFN', pretrain='./models/model_epoch_1.pth')
+    clf = c.train(model_name='CNN')
     c.validation(clf)
     c.testing(clf)
 

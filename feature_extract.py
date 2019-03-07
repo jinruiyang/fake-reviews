@@ -194,7 +194,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     ## Required parameters
-    parser.add_argument("--input_file", default='./bert_feature/moderate_bias_raw.txt', type=str)
+    parser.add_argument("--input_file", default='./bert_feature/bias_raw.txt', type=str)
     parser.add_argument("--output_file", default='out.txt', type=str)
     parser.add_argument("--bert_model", default='bert-base-uncased', type=str,
                         help="Bert pre-trained model selected in the list: bert-base-uncased, "
@@ -202,7 +202,7 @@ def main():
 
     ## Other parameters
     parser.add_argument("--do_lower_case", action='store_true', help="Set this flag if you are using an uncased model.")
-    parser.add_argument("--layers", default="-1", type=str)
+    parser.add_argument("--layers", default="-2", type=str)
     parser.add_argument("--max_seq_length", default=128, type=int,
                         help="The maximum total input sequence length after WordPiece tokenization. Sequences longer "
                             "than this will be truncated, and sequences shorter than this will be padded.")
@@ -273,11 +273,10 @@ def main():
             for b, example_index in enumerate(example_indices):
                 file_index += 1
                 feature = features[example_index.item()]
-                unique_id = int(feature.unique_id)
-                # feature = unique_id_to_feature[unique_id]
-                sentence_feature = torch.sum(all_encoder_layers[-1][b], dim = 0)
+                # sentence_feature = torch.sum(all_encoder_layers[-1][b], dim = 0)
+                sentence_feature = all_encoder_layers[-1][b]
                 sentence_feature = sentence_feature.detach().cpu().numpy()
-                np.save('./bert_feature/numpy_features/moderate_bias/'+str(file_index)+'.npy', sentence_feature)
+                np.save('./bert_feature/sequence_feature/bias/'+str(file_index)+'.npy', sentence_feature)
                 # writer.write(sentence_feature + "\n")
 
 

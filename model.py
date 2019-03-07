@@ -18,31 +18,39 @@ class model(nn.Module):
         self.model = nn.Sequential(
         nn.Linear(input_feature,512),
         nn.ReLU(),
-        nn.Dropout(0.3),
+        nn.Dropout(0.5),
         nn.Linear(512,256),
         nn.BatchNorm1d(256),
         nn.ReLU(),
-        nn.Dropout(0.3),
+        nn.Dropout(0.5),
         nn.Linear(256,128),
         nn.BatchNorm1d(128),
         nn.ReLU(),
-        nn.Dropout(0.3),
+        nn.Dropout(0.5),
         nn.Linear(128,64),
         nn.BatchNorm1d(64),
         nn.ReLU(),
-        nn.Dropout(0.3),
+        nn.Dropout(0.4),
         nn.Linear(64,32),
         nn.BatchNorm1d(32),
         nn.ReLU(),
+        nn.Dropout(0.3),
         nn.Linear(32,8),
+        nn.BatchNorm1d(8),
         nn.ReLU(),
-        nn.Linear(8,2),
+        nn.Dropout(0.3),
+        nn.Linear(8,4),
+        nn.BatchNorm1d(4),
+        nn.ReLU(4),
         )
 
-    def forward(self,x):
-        result = self.model(x)
+        self.classification = torch.nn.Linear(4,2)
 
-        return result
+    def forward(self,x):
+        feature = self.model(x)
+        result = self.classification(feature)
+
+        return result, feature
 
 # test = model()
 # dummy_input = torch.randn(2,7)

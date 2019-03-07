@@ -23,28 +23,27 @@ def load_data(file_lists, fractions = [0.7, 0.1], random_seed = 123456, label_mo
         data = pickle.load(file_in)
         file_in.close()
         category_name = f.split('.')[0]
+        label = -1
         if category_name == 'bias':
             raw_txt = './bert_feature/bias_raw.txt'
-            bert_feature = './bert_feature/numpy_features/bias/'
+            bert_feature = './bert_feature/sequence_feature/bias/'
+            label = 0
         elif category_name == 'non_bias':
             raw_txt = './bert_feature/non_bias_raw.txt'
-            bert_feature = './bert_feature/numpy_features/non_bias/'
+            bert_feature = './bert_feature/sequence_feature/non_bias/'
+            label = 0
         elif category_name == 'moderate_bias':
             raw_txt = './bert_feature/moderate_bias_raw.txt'
-            bert_feature = './bert_feature/numpy_features/moderate_bias/'
+            bert_feature = './bert_feature/sequence_feature/moderate_bias/'
+            label = 1
         bert_files = listdir(bert_feature)
         bert_files.sort(key=getint)
-        with open(raw_txt) as raw_sentences:
-            for review, y in zip(raw_sentences, bert_files):
-                bert = np.load(bert_feature + y)
-                review=review.strip()
-                label = data[review]
-                # print(label)
-                # print(y)
-                review_length = len(review.split(' '))
-                # data_set.append(bert/review_length)
-                data_set.append(bert)
-                labels.append(label)
+        if label < 0:
+            raise RuntimeError('label error')
+        for y in bert_files:
+            bert = np.load(bert_feature + y)
+            data_set.append(bert)
+            labels.append(label)
 
     random.seed(random_seed)
     lists = list(zip(data_set, labels))
